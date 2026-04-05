@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Search, Eye, Edit2, Trash2, ArrowUpCircle, IndianRupee, Bell, Wand2, Link, Reply } from 'lucide-react'
+import { Plus, Search, Eye, Edit2, Trash2, ArrowUpCircle, IndianRupee, Bell, Wand2, Link, Reply, Sparkles } from 'lucide-react'
 import type { Correspondence, Case, Lang, Status } from '../types'
 import { t } from '../i18n'
 import { format } from 'date-fns'
@@ -154,8 +154,9 @@ export default function CorrList({ items, cases, lang, apiKey, onAdd, onUpdate, 
                     <button onClick={() => setReplyItem(item)} className="action-btn text-green-600" title="Quick Reply"><Reply className="w-4 h-4" /></button>
                     <button onClick={() => { setDraftItem(item); setDraftType('reminder') }} className="action-btn text-amber-600"><Bell className="w-4 h-4" /></button>
                     <button onClick={() => { setDraftItem(item); setDraftType('payment_demand') }} className="action-btn text-red-600"><IndianRupee className="w-4 h-4" /></button>
-                    <button onClick={() => { setDraftItem(item); setDraftType('escalation') }} className="action-btn text-purple-600"><ArrowUpCircle className="w-4 h-4" /></button>
-                    <button onClick={() => { setDraftItem(item); setDraftType('fresh_notice') }} className="action-btn text-legal-700"><Wand2 className="w-4 h-4" /></button>
+                    <button onClick={() => { setDraftItem(item); setDraftType('escalation') }} className="action-btn text-purple-600" title={t('escalate', lang)}><ArrowUpCircle className="w-4 h-4" /></button>
+                    <button onClick={() => { setDraftItem(item); setDraftType('improve') }} className="action-btn text-blue-600" title={t('improveLetter', lang)}><Sparkles className="w-4 h-4" /></button>
+                    <button onClick={() => { setDraftItem(item); setDraftType('fresh_notice') }} className="action-btn text-legal-700" title={t('newLetter', lang)}><Wand2 className="w-4 h-4" /></button>
                     <button onClick={() => setConfirmId(item.id)} className="action-btn text-red-400"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </div>
@@ -166,7 +167,36 @@ export default function CorrList({ items, cases, lang, apiKey, onAdd, onUpdate, 
       )}
 
       {viewItem && <ViewModal item={viewItem} caseInfo={gc(viewItem.caseId)} parentItem={gp(viewItem.parentId)} lang={lang} onClose={() => setViewItem(null)} />}
-      {draftItem && <DraftModalV2 type={draftType} correspondence={draftItem} letterChain={getChain(draftItem)} caseInfo={gc(draftItem.caseId)} lang={lang} apiKey={apiKey} onClose={() => setDraftItem(null)} onUseDraft={text => { if (draftItem) onUpdate(draftItem.id, { body: text }) }} />}
+      {draftItem && (
+        <DraftModalV2
+          type={draftType}
+          correspondence={draftItem}
+          letterChain={getChain(draftItem)}
+          caseInfo={gc(draftItem.caseId)}
+          lang={lang}
+          apiKey={apiKey}
+          onClose={() => setDraftItem(null)}
+          onUseDraft={text => {
+            if (!draftItem) return
+            if (draftType === 'improve') {
+              onUpdate(draftItem.id, { body: text })
+            } else {
+              // Create a brand new letter based on the draft
+              onAdd({
+                caseId: draftItem.caseId,
+                subject: (draftType === 'escalation' ? 'ESCALATION: ' : '') + draftItem.subject,
+                type: (draftType === 'fresh_notice' ? 'notice' : draftType) as any,
+                status: 'draft',
+                date: new Date().toISOString().split('T')[0],
+                from: draftItem.from,
+                to: draftItem.to,
+                body: text,
+                parentId: draftItem.id,
+              })
+            }
+          }}
+        />
+      )}
       {replyItem && <QuickReply parent={replyItem} caseInfo={gc(replyItem.caseId)} lang={lang} onSave={item => { onAdd(item); setReplyItem(null) }} onClose={() => setReplyItem(null)} />}
 
       {confirmId && (

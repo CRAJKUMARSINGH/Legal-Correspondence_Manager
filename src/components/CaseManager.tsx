@@ -15,7 +15,8 @@ const emptyParty: OpposingParty = { name: '', designation: '', department: '', e
 
 const emptyForm = {
   title: '', title_hi: '', contractNo: '', workName: '', workName_hi: '',
-  clientName: '', clientDesignation: '', department: '', description: '',
+  clientName: '', clientDesignation: '', department: '',
+  email: '', phone: '', address: '', description: '',
 }
 
 export default function CaseManager({ cases, onAdd, onDelete, lang }: Props) {
@@ -87,6 +88,18 @@ export default function CaseManager({ cases, onAdd, onDelete, lang }: Props) {
               <div>
                 <label className="label">{t('workName', lang)} (हिंदी)</label>
                 <input className="input-field" value={form.workName_hi} onChange={e => set('workName_hi', e.target.value)} />
+              </div>
+              <div>
+                <label className="label">Email</label>
+                <input className="input-field" type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="contact@example.com" />
+              </div>
+              <div>
+                <label className="label">{t('phone', lang)}</label>
+                <input className="input-field" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+91 ..." />
+              </div>
+              <div className="md:col-span-2">
+                <label className="label">{t('address', lang)}</label>
+                <input className="input-field" value={form.address} onChange={e => set('address', e.target.value)} placeholder="Full office address..." />
               </div>
               <div className="md:col-span-2">
                 <label className="label">{lang === 'hi' ? 'विवरण' : 'Description'}</label>
@@ -185,6 +198,11 @@ export default function CaseManager({ cases, onAdd, onDelete, lang }: Props) {
                         <p className="text-xs font-medium text-gray-600">{lang === 'hi' ? 'ठेकेदार / ग्राहक' : 'Contractor / Client'}</p>
                         <p className="text-sm text-gray-700">{c.clientName}</p>
                         {c.clientDesignation && <p className="text-xs text-gray-500">{c.clientDesignation}</p>}
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs text-gray-400">
+                          {c.email && <span>{c.email}</span>}
+                          {c.phone && <span>{c.phone}</span>}
+                          {c.address && <span className="w-full">{c.address}</span>}
+                        </div>
                       </div>
                     </div>
 

@@ -20,6 +20,7 @@ const TYPE_LABELS: Record<DraftRequest['type'], { en: string; hi: string }> = {
   payment_demand: { en: 'Payment Demand',        hi: 'भुगतान मांग पत्र' },
   escalation:     { en: 'Escalation Letter',     hi: 'उच्च अधिकारी को पत्र' },
   fresh_notice:   { en: 'Fresh Legal Notice',    hi: 'नया कानूनी नोटिस' },
+  improve:        { en: 'Improve Letter',        hi: 'पत्र में सुधार करें' },
 }
 
 export default function DraftModalV2({ type, correspondence, letterChain, caseInfo, lang, apiKey, onClose, onUseDraft }: Props) {
@@ -29,6 +30,7 @@ export default function DraftModalV2({ type, correspondence, letterChain, caseIn
   const [interestRate, setInterestRate] = useState(correspondence?.interestRate?.toString() ?? '18')
   const [daysOverdue, setDaysOverdue] = useState(correspondence?.daysOverdue?.toString() ?? '')
   const [escalateTo, setEscalateTo] = useState('Chief Engineer')
+  const [negligentOfficer, setNegligentOfficer] = useState<string>(caseInfo?.opposingParties?.[0]?.name ?? '')
   const [negligence, setNegligence] = useState('')
   const [draft, setDraft] = useState('')
   const [loading, setLoading] = useState(false)
@@ -36,11 +38,20 @@ export default function DraftModalV2({ type, correspondence, letterChain, caseIn
   const [copied, setCopied] = useState(false)
   const [showChain, setShowChain] = useState(false)
 
-  // Auto-fill negligence from opposing parties
-  const eeParty = caseInfo?.opposingParties?.find(p => p.designation.toLowerCase().includes('executive'))
-  const defaultNegligence = eeParty
-    ? `${eeParty.name} (${eeParty.designation}, ${eeParty.department}) has intentionally failed to process running bills, respond to correspondence, and take any action despite multiple written reminders.`
-    : ''
+  const updateNegligence = (officerName: string) => {
+    setNegligentOfficer(officerName)
+    const p = caseInfo?.opposingParties?.find(o => o.name === officerName)
+    if (p) {
+      setNegligence(`${p.name} (${p.designation}, ${p.department}) has intentionally failed to process running bills, respond to correspondence, and take any action despite multiple written reminders. This constitutes willful neglect and dereliction of duty.`)
+    }
+  }
+
+  // Initial auto-fill
+  useState(() => {
+    if (type === 'escalation' && !negligence && negligentOfficer) {
+      updateNegligence(negligentOfficer)
+    }
+  })
 
   const handleGenerate = async () => {
     if (!apiKey) { setError('Please set your API key in Settings first.'); return }
@@ -58,7 +69,7 @@ export default function DraftModalV2({ type, correspondence, letterChain, caseIn
         interestRate: interestRate ? parseFloat(interestRate) : undefined,
         daysOverdue: daysOverdue ? parseInt(daysOverdue) : undefined,
         escalateTo: type === 'escalation' ? escalateTo : undefined,
-        negligenceDetails: type === 'escalation' ? (negligence || defaultNegligence) : undefined,
+        negligenceDetails: type === 'escalation' ? negligence : undefined,
       }
       const result = await generateDraftV2(req, apiKey)
       setDraft(result)
@@ -183,9 +194,19 @@ export default function DraftModalV2({ type, correspondence, letterChain, caseIn
                   <option value="Superintending Engineer">{t('superEngineer', lang)}</option>
                 </select>
               </div>
+              {caseInfo?.opposingParties && caseInfo.opposingParties.length > 0 && (
+                <div>
+                  <label className="label">{lang === 'hi' ? 'लापरवाह अधिकारी' : 'Negligent Officer'}</label>
+                  <select className="input-field" value={negligentOfficer} onChange={e => updateNegligence(e.target.value)}>
+                    {caseInfo.opposingParties.map(p => (
+                      <option key={p.name} value={p.name}>{p.name} ({p.designation})</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="label">{t('negligenceDetails', lang)}</label>
-                <textarea className="input-field min-h-[80px]" value={negligence || defaultNegligence}
+                <textarea className="input-field min-h-[100px]" value={negligence}
                   onChange={e => setNegligence(e.target.value)}
                   placeholder="Describe specific acts of negligence..." />
               </div>

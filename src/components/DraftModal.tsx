@@ -64,6 +64,7 @@ export default function DraftModal({ type, correspondence, caseInfo, lang, apiKe
     payment_demand: t('draftPaymentDemand', lang),
     escalation: t('escalate', lang),
     fresh_notice: t('newLetter', lang),
+    improve: t('improveLetter', lang),
   }
 
   return (

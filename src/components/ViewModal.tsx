@@ -1,4 +1,4 @@
-import { X, Copy, Check, Printer, Link } from 'lucide-react'
+import { X, Copy, Check, Printer, Link, Download } from 'lucide-react'
 import { useState } from 'react'
 import type { Correspondence, Case, Lang } from '../types'
 import { t } from '../i18n'
@@ -65,6 +65,18 @@ export default function ViewModal({ item, caseInfo, parentItem, lang, onClose }:
     setTimeout(() => win.print(), 500)
   }
 
+  const handleDownload = () => {
+    const refLine = item.referenceNumber ? `Ref. No.: ${item.referenceNumber}\n` : ''
+    const text = `${refLine}${subject}\n\nFrom: ${item.from}\nTo: ${item.to}${item.cc?.length ? `\nCC: ${item.cc.join(', ')}` : ''}\nDate: ${format(new Date(item.date), 'dd MMMM yyyy')}\n\n${body}`
+    const blob = new Blob([text], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${item.referenceNumber || 'letter'}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const hasHindi = !!(item.body_hi || item.subject_hi)
   const hasEnglish = !!item.body
 
@@ -91,6 +103,10 @@ export default function ViewModal({ item, caseInfo, parentItem, lang, onClose }:
             <button onClick={handlePrint} className="flex items-center gap-1 text-xs px-3 py-1 bg-legal-700 text-white rounded-full hover:bg-legal-600">
               <Printer className="w-3 h-3" />
               Print
+            </button>
+            <button onClick={handleDownload} className="flex items-center gap-1 text-xs px-3 py-1 bg-gray-100 rounded-full hover:bg-gray-200">
+              <Download className="w-3 h-3" />
+              txt
             </button>
             <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg ml-1">
               <X className="w-5 h-5" />

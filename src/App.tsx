@@ -36,7 +36,7 @@ export default function App() {
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         {activeTab === 'dashboard' && (
-          <Dashboard cases={cases} items={items} lang={lang} onSync={sync} syncing={syncing} />
+          <Dashboard cases={cases} items={items} lang={lang} onSync={sync} syncing={syncing} onTabChange={setActiveTab} />
         )}
         {activeTab === 'cases' && (
           <CaseManager cases={cases} onAdd={addCase} onDelete={deleteCase} lang={lang} />

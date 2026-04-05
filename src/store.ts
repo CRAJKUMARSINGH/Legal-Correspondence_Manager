@@ -123,6 +123,9 @@ function mapLuminaireCase(lc: LuminaireCase): Omit<Case, 'id' | 'createdAt'> {
     clientName: lc.client.name,
     clientDesignation: lc.client.designation,
     department: lc.client.department,
+    email: lc.client.email ?? undefined,
+    phone: lc.client.phone ?? undefined,
+    address: lc.client.address ?? undefined,
     description: lc.description,
     luminaireId: lc.id,
   }

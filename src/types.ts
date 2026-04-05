@@ -51,6 +51,9 @@ export interface Case {
   clientName: string
   clientDesignation?: string
   department?: string
+  email?: string
+  phone?: string
+  address?: string
   description?: string
   opposingParties?: OpposingParty[]
   luminaireId?: string   // synced from Luminaire API
@@ -66,7 +69,7 @@ export interface OpposingParty {
 }
 
 export interface DraftRequest {
-  type: 'reminder' | 'payment_demand' | 'escalation' | 'fresh_notice'
+  type: 'reminder' | 'payment_demand' | 'escalation' | 'fresh_notice' | 'improve'
   originalCorrespondence?: Correspondence
   letterChain?: Correspondence[]   // full thread for context
   caseInfo?: Case

@@ -144,6 +144,26 @@ ${req.additionalContext ? `\nADDITIONAL INSTRUCTIONS: ${req.additionalContext}` 
 
 Write the complete letter with proper CC list, ready to print and send.`
 
+    case 'improve':
+      return `Improve the following legal draft in ${langLabel} dated ${today}.
+ 
+${caseCtx}
+${chainCtx}
+
+ORIGINAL DRAFT TO IMPROVE:
+${req.originalCorrespondence?.body || req.originalCorrespondence?.body_hi || '[DRAFT CONTENT]'}
+
+REQUIREMENTS:
+- Polished, more professional, and firm legal tone
+- Standardize the structure and formatting according to PWD/CPWD legal practice
+- Ensure proper legal citations (Indian Contract Act, etc.) are included or strengthened
+- Remove any ambiguity or passive language
+- Keep the original intent and core facts exactly as stated
+- Use assertive phrases: "this is to reiterate", "failure to address", "material breach"
+${req.additionalContext ? `\nADDITIONAL INSTRUCTIONS: ${req.additionalContext}` : ''}
+
+Write the complete IMPROVED letter ready to print and send.`
+
     case 'fresh_notice':
       return `Draft a fresh formal LEGAL NOTICE in ${langLabel} dated ${today}.
 
