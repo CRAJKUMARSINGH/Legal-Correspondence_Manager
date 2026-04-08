@@ -80,6 +80,12 @@ export default function Header({ lang, onToggleLang, onOpenSettings, activeTab, 
             {t(tab, lang)}
           </button>
         ))}
+        <button
+          onClick={() => onTabChange('wizard')}
+          className="ml-auto mb-1 flex items-center gap-1.5 px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold rounded-lg transition-colors"
+        >
+          ✦ {lang === 'hi' ? 'ड्राफ्ट बनाएं' : 'Draft Letter'}
+        </button>
       </nav>
     </header>
   )
