@@ -16,7 +16,7 @@ export default function App() {
 
   const { cases, addCase, updateCase, deleteCase } = useCases()
   const { items, addItem, updateItem, deleteItem } = useCorrespondence()
-  const { sync, syncing, lastSync, syncError } = useLuminaireSync(cases, addCase, items, addItem)
+  const { sync, syncing, lastSync, syncError } = useLuminaireSync(cases, addCase, updateCase, items, addItem, updateItem)
 
   const toggleLang = () => setLang(l => l === 'en' ? 'hi' : 'en')
 
@@ -39,7 +39,7 @@ export default function App() {
           <Dashboard cases={cases} items={items} lang={lang} onSync={sync} syncing={syncing} onTabChange={setActiveTab} />
         )}
         {activeTab === 'cases' && (
-          <CaseManager cases={cases} onAdd={addCase} onDelete={deleteCase} lang={lang} />
+          <CaseManager cases={cases} onAdd={addCase} onUpdate={updateCase} onDelete={deleteCase} lang={lang} />
         )}
         {activeTab === 'correspondence' && (
           <CorrespondenceList

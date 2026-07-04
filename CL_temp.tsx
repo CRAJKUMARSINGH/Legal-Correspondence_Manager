@@ -1,0 +1,10 @@
+import { useState } from 'react'
+import { Plus, Search, Eye, Edit2, Trash2, ArrowUpCircle, IndianRupee, Bell, Wand2, Link } from 'lucide-react'
+import type { Correspondence, Case, Lang, Status } from './legal-correspondence-manager/src/types'
+import { t } from './legal-correspondence-manager/src/i18n'
+import { format } from 'date-fns'
+import CorrespondenceForm from './legal-correspondence-manager/src/components/CorrespondenceForm'
+import DraftModal from './legal-correspondence-manager/src/components/DraftModal'
+import ViewModal from './legal-correspondence-manager/src/components/ViewModal'
+import type { DraftRequest } from './legal-correspondence-manager/src/types'
+export default function CorrespondenceList() { return null }

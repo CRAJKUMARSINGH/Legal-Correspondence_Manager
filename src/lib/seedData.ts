@@ -1,10 +1,25 @@
 // Seed data sourced from Luminaire Docs API (https://luminaire-docs.preview.emergentagent.com)
 // Case: M/s Shri Bajrang Construction — PWD Dungarpur, Rajasthan
-// Used as default data when no cases exist and API is unreachable
+// Used as permanent demo/training data — seed records are protected from deletion
 
 import type { Case, Correspondence } from '../types'
 
-export const SEED_CASE: Omit<Case, 'id' | 'createdAt'> = {
+// Stable IDs so seed data is always identifiable across resets
+export const SEED_CASE_ID = 'seed-case-amli-fala-2023'
+export const SEED_CORR_IDS = [
+  'seed-corr-work-order-2023',
+  'seed-corr-forest-clearance-2025',
+  'seed-corr-payment-complaint-2025',
+  'seed-corr-delay-objection-2025',
+]
+
+export function isSeedRecord(id: string): boolean {
+  return id === SEED_CASE_ID || SEED_CORR_IDS.includes(id)
+}
+
+export const SEED_CASE: Omit<Case, 'id' | 'createdAt'> & { id: string; createdAt: string } = {
+  id: SEED_CASE_ID,
+  createdAt: '2023-07-17T00:00:00.000Z',
   title: 'Construction of Amli Fala Bridge - Payment and Clearance Delays',
   title_hi: 'अमली फाला पुल निर्माण - भुगतान एवं क्लीयरेंस विलंब',
   caseNumber: 'PWD/2023-24/Construction/Amli-Fala',
@@ -23,9 +38,11 @@ export const SEED_CASE: Omit<Case, 'id' | 'createdAt'> = {
   luminaireId: '928c13dc-f411-4aa0-a158-501f317ba490',
 }
 
-export function buildSeedCorrespondence(caseId: string): Omit<Correspondence, 'id' | 'createdAt' | 'updatedAt'>[] {
+export function buildSeedCorrespondence(caseId: string): (Omit<Correspondence, 'createdAt' | 'updatedAt'> & { id: string })[] {
+  const now = '2023-07-17T00:00:00.000Z'
   return [
     {
+      id: SEED_CORR_IDS[0],
       caseId,
       subject: 'Written Order to Commence Work — Amli Fala Bridge Construction',
       type: 'order',
@@ -71,6 +88,7 @@ PWD Dn Dungarpur`,
       luminaireId: 'a2ccae0c-c32d-4975-88ac-8a35ec14ec75',
     },
     {
+      id: SEED_CORR_IDS[1],
       caseId,
       subject: 'Forest Clearance (Van Bhoomi Hastantaran) and Hindrances Register Update',
       subject_hi: 'वन भूमि हस्तांतरण एन.ओ.सी. एवं हिंदरेंस रजिस्टर अपडेट',
@@ -106,6 +124,7 @@ PWD Dn Dungarpur`,
       luminaireId: '4b020309-f7a0-4d15-89d2-288fa2677661',
     },
     {
+      id: SEED_CORR_IDS[2],
       caseId,
       subject: 'Construction Program Progress and Pending Payment Issue',
       subject_hi: 'निर्माण कार्यक्रम की प्रगति एवं भुगतान लंबित होने के संबंध में',
@@ -141,6 +160,7 @@ PWD Dn Dungarpur`,
       luminaireId: 'e6f4cdba-2418-4750-a48e-464e84855346',
     },
     {
+      id: SEED_CORR_IDS[3],
       caseId,
       subject: 'Strengthening and Widening of BT Road — Reasons for Delay and Objection to Work Withdrawal',
       subject_hi: 'सड़क निर्माण कार्य में विलंब के कारण एवं कार्य वापसी के विरुद्ध आपत्ति',

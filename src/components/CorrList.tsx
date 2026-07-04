@@ -4,7 +4,7 @@ import type { Correspondence, Case, Lang, Status } from '../types'
 import { t } from '../i18n'
 import { format } from 'date-fns'
 import CorrespondenceForm from './CorrespondenceForm'
-import DraftModalV2 from './DraftModalV2'
+import DraftModal from "./DraftModal";
 import ViewModal from './ViewModal'
 import QuickReply from './QuickReply'
 import type { DraftRequest } from '../types'
@@ -168,7 +168,7 @@ export default function CorrList({ items, cases, lang, apiKey, onAdd, onUpdate, 
 
       {viewItem && <ViewModal item={viewItem} caseInfo={gc(viewItem.caseId)} parentItem={gp(viewItem.parentId)} lang={lang} onClose={() => setViewItem(null)} />}
       {draftItem && (
-        <DraftModalV2
+        <DraftModal
           type={draftType}
           correspondence={draftItem}
           letterChain={getChain(draftItem)}

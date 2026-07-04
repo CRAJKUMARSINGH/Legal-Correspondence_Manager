@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Briefcase, Trash2, ChevronDown, ChevronUp, Users, FileText, Building2 } from 'lucide-react'
+import { Plus, Briefcase, Trash2, Edit2, ChevronDown, ChevronUp, Users, FileText, Building2 } from 'lucide-react'
 import type { Case, OpposingParty, Lang } from '../types'
 import { t } from '../i18n'
 import { format } from 'date-fns'
@@ -7,6 +7,7 @@ import { format } from 'date-fns'
 interface Props {
   cases: Case[]
   onAdd: (c: Omit<Case, 'id' | 'createdAt'>) => void
+  onUpdate: (id: string, updates: Partial<Case>) => void
   onDelete: (id: string) => void
   lang: Lang
 }
@@ -19,14 +20,42 @@ const emptyForm = {
   email: '', phone: '', address: '', description: '',
 }
 
-export default function CaseManager({ cases, onAdd, onDelete, lang }: Props) {
+export default function CaseManager({ cases, onAdd, onUpdate, onDelete, lang }: Props) {
   const [showForm, setShowForm] = useState(false)
+  const [editingCase, setEditingCase] = useState<Case | null>(null)
   const [form, setForm] = useState(emptyForm)
   const [parties, setParties] = useState<OpposingParty[]>([])
   const [expandedId, setExpandedId] = useState<string | null>(cases[0]?.id ?? null)
   const [confirmId, setConfirmId] = useState<string | null>(null)
 
   const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }))
+
+  const startEdit = (case_: Case) => {
+    setEditingCase(case_)
+    setForm({
+      title: case_.title || '',
+      title_hi: case_.title_hi || '',
+      contractNo: case_.contractNo || '',
+      workName: case_.workName || '',
+      workName_hi: case_.workName_hi || '',
+      clientName: case_.clientName || '',
+      clientDesignation: case_.clientDesignation || '',
+      department: case_.department || '',
+      email: case_.email || '',
+      phone: case_.phone || '',
+      address: case_.address || '',
+      description: case_.description || '',
+    })
+    setParties(case_.opposingParties || [])
+    setShowForm(true)
+  }
+
+  const cancelEdit = () => {
+    setEditingCase(null)
+    setForm(emptyForm)
+    setParties([])
+    setShowForm(false)
+  }
 
   const addParty = () => setParties(p => [...p, { ...emptyParty }])
   const setParty = (i: number, k: keyof OpposingParty, v: string) =>
@@ -36,10 +65,14 @@ export default function CaseManager({ cases, onAdd, onDelete, lang }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.title || !form.clientName) return
-    onAdd({ ...form, opposingParties: parties.filter(p => p.name) })
-    setForm(emptyForm)
-    setParties([])
-    setShowForm(false)
+    
+    if (editingCase) {
+      onUpdate(editingCase.id, { ...form, opposingParties: parties.filter(p => p.name) })
+    } else {
+      onAdd({ ...form, opposingParties: parties.filter(p => p.name) })
+    }
+    
+    cancelEdit()
   }
 
   return (
@@ -54,7 +87,9 @@ export default function CaseManager({ cases, onAdd, onDelete, lang }: Props) {
 
       {showForm && (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-          <h3 className="font-semibold text-gray-700 mb-4">{t('addCase', lang)}</h3>
+          <h3 className="font-semibold text-gray-700 mb-4">
+            {editingCase ? t('editCase', lang) : t('addCase', lang)}
+          </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -128,8 +163,10 @@ export default function CaseManager({ cases, onAdd, onDelete, lang }: Props) {
             </div>
 
             <div className="flex gap-3 justify-end">
-              <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">{t('cancel', lang)}</button>
-              <button type="submit" className="btn-primary">{t('save', lang)}</button>
+              <button type="button" onClick={cancelEdit} className="btn-secondary">{t('cancel', lang)}</button>
+              <button type="submit" className="btn-primary">
+                {editingCase ? t('update', lang) : t('save', lang)}
+              </button>
             </div>
           </form>
         </div>
@@ -165,8 +202,14 @@ export default function CaseManager({ cases, onAdd, onDelete, lang }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
+                    <button onClick={e => { e.stopPropagation(); startEdit(c) }}
+                      className="p-1.5 text-gray-300 hover:text-blue-500 transition-colors rounded"
+                      title={lang === 'hi' ? 'संपादित करें' : 'Edit'}>
+                      <Edit2 className="w-4 h-4" />
+                    </button>
                     <button onClick={e => { e.stopPropagation(); setConfirmId(c.id) }}
-                      className="p-1.5 text-gray-300 hover:text-red-500 transition-colors rounded">
+                      className="p-1.5 text-gray-300 hover:text-red-500 transition-colors rounded"
+                      title={lang === 'hi' ? 'हटाएं' : 'Delete'}>
                       <Trash2 className="w-4 h-4" />
                     </button>
                     {expanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}

@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import type { Correspondence, Case } from './types'
 import { fetchLuminaireCases, fetchLuminaireCorrespondence } from './lib/luminaireApi'
 import type { LuminaireCase, LuminaireCorrespondence } from './lib/luminaireApi'
-import { SEED_CASE, buildSeedCorrespondence } from './lib/seedData'
+import { SEED_CASE, SEED_CASE_ID, buildSeedCorrespondence } from './lib/seedData'
+import { StorageService, debounce } from './lib/storage'
 
 const CASES_KEY = 'lcm_cases'
 const CORR_KEY = 'lcm_correspondence'
@@ -13,104 +14,185 @@ export interface Settings {
   defaultLang: 'en' | 'hi'
 }
 
-function load<T>(key: string, fallback: T): T {
+// ── One-time seed and migration ────────────────────────────────────────
+async function runSeedAndMigrationOnce() {
+  // First migrate from localStorage if needed
   try {
-    const raw = localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as T) : fallback
-  } catch {
-    return fallback
+    await StorageService.migrateFromLocalStorage()
+  } catch (error) {
+    console.warn('Migration from localStorage failed:', error)
   }
-}
 
-function save<T>(key: string, value: T) {
-  localStorage.setItem(key, JSON.stringify(value))
-}
+  // Check if we need to seed
+  const existingCases = await StorageService.loadCases()
+  if (existingCases.length > 0) return
 
-// ── One-time seed — runs synchronously before any hook initializes ──────────
-function runSeedOnce() {
-  if (localStorage.getItem('lcm_seeded')) return
-
-  const caseId = crypto.randomUUID()
-  const seedCase: Case = {
-    ...SEED_CASE,
-    id: caseId,
-    createdAt: new Date().toISOString(),
-  }
-  save(CASES_KEY, [seedCase])
+  const caseId = SEED_CASE_ID
+  const seedCase: Case = { ...SEED_CASE }
 
   const now = new Date().toISOString()
   const seededCorr: Correspondence[] = buildSeedCorrespondence(caseId).map(item => ({
     ...item,
-    id: crypto.randomUUID(),
     createdAt: now,
     updatedAt: now,
   }))
-  save(CORR_KEY, seededCorr)
 
-  localStorage.setItem('lcm_seeded', '1')
+  await StorageService.saveCases([seedCase])
+  await StorageService.saveCorrespondence(seededCorr)
 }
 
-// Run immediately at module load — safe because localStorage is always available in browser
-runSeedOnce()
+// Initialize seed/migration
+runSeedAndMigrationOnce()
 
 // ── Hooks ────────────────────────────────────────────────────────────────────
 
 export function useCases() {
-  const [cases, setCases] = useState<Case[]>(() => load<Case[]>(CASES_KEY, []))
+  const [cases, setCases] = useState<Case[]>([])
+  const [loading, setLoading] = useState(true)
 
-  useEffect(() => { save(CASES_KEY, cases) }, [cases])
+  // Load cases on mount
+  useEffect(() => {
+    let mounted = true
+    StorageService.loadCases().then(loadedCases => {
+      if (mounted) {
+        setCases(loadedCases)
+        setLoading(false)
+      }
+    }).catch(error => {
+      console.error('Failed to load cases:', error)
+      if (mounted) setLoading(false)
+    })
+    return () => { mounted = false }
+  }, [])
 
-  const addCase = (c: Omit<Case, 'id' | 'createdAt'>): Case => {
+  // Debounced save
+  const debouncedSave = useCallback(
+    debounce(async (casesToSave: Case[]) => {
+      try {
+        await StorageService.saveCases(casesToSave)
+      } catch (error) {
+        console.error('Failed to save cases:', error)
+      }
+    }, 400),
+    []
+  )
+
+  useEffect(() => {
+    if (cases.length > 0) {
+      debouncedSave(cases)
+    }
+  }, [cases, debouncedSave])
+
+  const addCase = useCallback((c: Omit<Case, 'id' | 'createdAt'>): Case => {
     const newCase: Case = { ...c, id: crypto.randomUUID(), createdAt: new Date().toISOString() }
     setCases(prev => [newCase, ...prev])
     return newCase
-  }
+  }, [])
 
-  const updateCase = (id: string, updates: Partial<Case>) => {
+  const updateCase = useCallback((id: string, updates: Partial<Case>) => {
     setCases(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c))
-  }
+  }, [])
 
-  const deleteCase = (id: string) => {
+  const deleteCase = useCallback((id: string) => {
     setCases(prev => prev.filter(c => c.id !== id))
-  }
+  }, [])
 
-  return { cases, addCase, updateCase, deleteCase }
+  // Delete case with cascade option
+  const deleteCaseWithCorrespondence = useCallback((id: string, cascade: boolean = false) => {
+    setCases(prev => prev.filter(c => c.id !== id))
+    return cascade // Return whether cascade was requested for UI to handle
+  }, [])
+
+  return { cases, loading, addCase, updateCase, deleteCase, deleteCaseWithCorrespondence }
 }
 
 export function useCorrespondence() {
-  const [items, setItems] = useState<Correspondence[]>(() => load<Correspondence[]>(CORR_KEY, []))
+  const [items, setItems] = useState<Correspondence[]>([])
+  const [loading, setLoading] = useState(true)
 
-  useEffect(() => { save(CORR_KEY, items) }, [items])
+  // Load correspondence on mount
+  useEffect(() => {
+    let mounted = true
+    StorageService.loadCorrespondence().then(loadedItems => {
+      if (mounted) {
+        setItems(loadedItems)
+        setLoading(false)
+      }
+    }).catch(error => {
+      console.error('Failed to load correspondence:', error)
+      if (mounted) setLoading(false)
+    })
+    return () => { mounted = false }
+  }, [])
 
-  const addItem = (item: Omit<Correspondence, 'id' | 'createdAt' | 'updatedAt'>): Correspondence => {
+  // Debounced save
+  const debouncedSave = useCallback(
+    debounce(async (itemsToSave: Correspondence[]) => {
+      try {
+        await StorageService.saveCorrespondence(itemsToSave)
+      } catch (error) {
+        console.error('Failed to save correspondence:', error)
+      }
+    }, 400),
+    []
+  )
+
+  useEffect(() => {
+    if (items.length > 0) {
+      debouncedSave(items)
+    }
+  }, [items, debouncedSave])
+
+  const addItem = useCallback((item: Omit<Correspondence, 'id' | 'createdAt' | 'updatedAt'>): Correspondence => {
     const now = new Date().toISOString()
     const newItem: Correspondence = { ...item, id: crypto.randomUUID(), createdAt: now, updatedAt: now }
     setItems(prev => [newItem, ...prev])
     return newItem
-  }
+  }, [])
 
-  const updateItem = (id: string, updates: Partial<Correspondence>) => {
+  const updateItem = useCallback((id: string, updates: Partial<Correspondence>) => {
     setItems(prev => prev.map(i => i.id === id ? { ...i, ...updates, updatedAt: new Date().toISOString() } : i))
-  }
+  }, [])
 
-  const deleteItem = (id: string) => {
+  const deleteItem = useCallback((id: string) => {
     setItems(prev => prev.filter(i => i.id !== id))
-  }
+  }, [])
 
-  return { items, addItem, updateItem, deleteItem }
+  // Delete all correspondence for a specific case (cascade delete)
+  const deleteItemsByCaseId = useCallback((caseId: string) => {
+    setItems(prev => prev.filter(i => i.caseId !== caseId))
+  }, [])
+
+  return { items, loading, addItem, updateItem, deleteItem, deleteItemsByCaseId }
 }
 
 export function useSettings() {
-  const [settings, setSettings] = useState<Settings>(() =>
-    load<Settings>(SETTINGS_KEY, { apiKey: '', defaultLang: 'en' })
-  )
+  const [settings, setSettings] = useState<Settings>({ apiKey: '', defaultLang: 'en' })
+  const [loading, setLoading] = useState(true)
 
-  const saveSettings = (s: Settings) => {
+  // Load settings on mount
+  useEffect(() => {
+    let mounted = true
+    StorageService.loadSettings().then(loadedSettings => {
+      if (mounted) {
+        setSettings(loadedSettings)
+        setLoading(false)
+      }
+    }).catch(error => {
+      console.error('Failed to load settings:', error)
+      if (mounted) setLoading(false)
+    })
+    return () => { mounted = false }
+  }, [])
+
+  const saveSettings = useCallback((s: Settings) => {
     setSettings(s)
-    save(SETTINGS_KEY, s)
-  }
+    StorageService.saveSettings(s).catch(error => {
+      console.error('Failed to save settings:', error)
+    })
+  }, [])
 
-  return { settings, saveSettings }
+  return { settings, loading, saveSettings }
 }
 
 // ── Luminaire API sync ───────────────────────────────────────────────────────
@@ -168,36 +250,76 @@ function mapLuminaireCorrespondence(
 export function useLuminaireSync(
   cases: Case[],
   addCase: (c: Omit<Case, 'id' | 'createdAt'>) => Case,
+  updateCase: (id: string, updates: Partial<Case>) => void,
   items: Correspondence[],
   addItem: (i: Omit<Correspondence, 'id' | 'createdAt' | 'updatedAt'>) => Correspondence,
+  updateItem: (id: string, updates: Partial<Correspondence>) => void,
 ) {
   const [syncing, setSyncing] = useState(false)
-  const [lastSync, setLastSync] = useState<string | null>(() => localStorage.getItem('lcm_last_sync'))
+  const [lastSync, setLastSync] = useState<string | null>(null)
   const [syncError, setSyncError] = useState<string | null>(null)
+
+  // Load last sync time from IndexedDB via localStorage fallback
+  useEffect(() => {
+    const saved = localStorage.getItem('lcm_last_sync')
+    if (saved) setLastSync(saved)
+  }, [])
 
   const sync = useCallback(async () => {
     setSyncing(true)
     setSyncError(null)
     try {
+      // Create Maps for O(1) lookups instead of O(n) array.find()
+      const casesByLuminaireId = new Map(
+        cases.filter(c => c.luminaireId).map(c => [c.luminaireId!, c])
+      )
+      const itemsByLuminaireId = new Map(
+        items.filter(i => i.luminaireId).map(i => [i.luminaireId!, i])
+      )
+
+      // Sync cases with proper upsert logic
       const luminaireCases = await fetchLuminaireCases()
       const caseIdMap: Record<string, string> = {}
 
       for (const lc of luminaireCases) {
-        const existing = cases.find(c => c.luminaireId === lc.id)
-        if (existing) {
-          caseIdMap[lc.id] = existing.id
-        } else {
+        const existing = casesByLuminaireId.get(lc.id)
+        
+        if (!existing) {
+          // Insert new case
           const newCase = addCase(mapLuminaireCase(lc))
           caseIdMap[lc.id] = newCase.id
+        } else {
+          // Update if remote is newer
+          const remoteUpdatedAt = new Date(lc.updated_at || lc.created_at)
+          const localUpdatedAt = new Date(existing.createdAt)
+          
+          if (remoteUpdatedAt > localUpdatedAt) {
+            updateCase(existing.id, mapLuminaireCase(lc))
+          }
+          caseIdMap[lc.id] = existing.id
         }
       }
 
+      // Sync correspondence with proper upsert logic
       const luminaireCorr = await fetchLuminaireCorrespondence()
       for (const lc of luminaireCorr) {
-        if (items.find(i => i.luminaireId === lc.id)) continue
+        const existing = itemsByLuminaireId.get(lc.id)
         const localCaseId = caseIdMap[lc.case_id]
-        if (!localCaseId) continue
-        addItem(mapLuminaireCorrespondence(lc, localCaseId))
+        
+        if (!localCaseId) continue // Skip if case doesn't exist locally
+        
+        if (!existing) {
+          // Insert new correspondence
+          addItem(mapLuminaireCorrespondence(lc, localCaseId))
+        } else {
+          // Update if remote is newer
+          const remoteUpdatedAt = new Date(lc.sent_at || lc.created_at)
+          const localUpdatedAt = new Date(existing.createdAt)
+          
+          if (remoteUpdatedAt > localUpdatedAt) {
+            updateItem(existing.id, mapLuminaireCorrespondence(lc, localCaseId))
+          }
+        }
       }
 
       const now = new Date().toISOString()
@@ -208,7 +330,7 @@ export function useLuminaireSync(
     } finally {
       setSyncing(false)
     }
-  }, [cases, items, addCase, addItem])
+  }, [cases, addCase, updateCase, items, addItem, updateItem])
 
   return { sync, syncing, lastSync, syncError }
 }

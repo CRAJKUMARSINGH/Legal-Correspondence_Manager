@@ -13,6 +13,11 @@ export type CorrespondenceType =
 
 export type Status = 'sent' | 'pending_reply' | 'replied' | 'escalated' | 'resolved' | 'overdue' | 'draft'
 
+export interface Settings {
+  apiKey: string
+  defaultLang: 'en' | 'hi'
+}
+
 export interface Correspondence {
   id: string
   caseId: string
