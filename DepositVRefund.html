@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit-V Refund Application Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a5276;
+            --primary-light: #2980b9;
+            --accent: #e67e22;
+            --bg-dark: #0f1923;
+            --bg-card: #1a2634;
+            --bg-input: #243447;
+            --text-light: #ecf0f1;
+            --text-muted: #95a5a6;
+            --border: #2c3e50;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --gold: #f39c12;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+
+        /* ===== FORM UI ===== */
+        #form-section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+        }
+
+        .form-header {
+            text-align: center;
+            padding: 40px 0 30px;
+        }
+
+        .form-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 22px;
+            transition: border-color 0.3s;
+        }
+
+        .card:hover { border-color: var(--primary-light); }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(180deg, var(--gold), var(--accent));
+            border-radius: 2px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-grid .full-width { grid-column: 1 / -1; }
+
+        label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.15);
+        }
+
+        textarea { resize: vertical; min-height: 60px; }
+
+        /* Works table in form */
+        .works-table-wrapper {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .works-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .works-table th {
+            background: var(--bg-input);
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .works-table td {
+            padding: 6px 4px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .works-table input {
+            padding: 8px 10px;
+            font-size: 0.85rem;
+        }
+
+        .works-table .sno { width: 40px; text-align: center; }
+
+        .btn-remove {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .btn-remove:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            padding: 10px 18px;
+            background: transparent;
+            border: 1px dashed var(--primary-light);
+            color: var(--primary-light);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            background: rgba(41, 128, 185, 0.1);
+            border-style: solid;
+        }
+
+        .btn-generate {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(26, 82, 118, 0.4);
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 82, 118, 0.6);
+        }
+
+        .btn-generate:active { transform: translateY(0); }
+
+        /* ===== PRINT OUTPUT ===== */
+        #print-section {
+            display: none;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 18mm 20mm 20mm;
+            font-family: 'Times New Roman', 'Noto Sans Devanagari', serif;
+            font-size: 13pt;
+            color: #000;
+            background: #fff;
+            position: relative;
+            line-height: 1.7;
+        }
+
+        #print-section .print-title {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        #print-section .address-block {
+            margin-bottom: 6px;
+        }
+
+        #print-section .address-block strong {
+            display: block;
+        }
+
+        #print-section .subject-line {
+            margin: 14px 0;
+            font-weight: bold;
+        }
+
+        #print-section .body-text {
+            text-align: justify;
+            margin-bottom: 10px;
+        }
+
+        #print-section .points-list {
+            margin: 8px 0 12px 18px;
+        }
+
+        #print-section .points-list li {
+            margin-bottom: 6px;
+        }
+
+        #print-section table.works-print {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: 11pt;
+        }
+
+        #print-section table.works-print th,
+        #print-section table.works-print td {
+            border: 1px solid #000;
+            padding: 5px 8px;
+            text-align: center;
+        }
+
+        #print-section table.works-print th {
+            background: #f0f0f0;
+            font-weight: bold;
+            font-size: 10.5pt;
+        }
+
+        #print-section table.works-print td.text-left { text-align: left; }
+
+        #print-section table.works-print .total-row {
+            font-weight: bold;
+            background: #f7f7f7;
+        }
+
+        #print-section .closing-block {
+            margin-top: 30px;
+        }
+
+        #print-section .signature-block {
+            margin-top: 50px;
+            text-align: left;
+        }
+
+        #print-section .signature-block .sign-line {
+            margin-top: 40px;
+            font-weight: bold;
+        }
+
+        #print-section .back-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 22px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            z-index: 999;
+        }
+
+        #print-section .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 120px;
+            padding: 10px 22px;
+            background: var(--success);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            z-index: 999;
+        }
+
+        @media print {
+            body { background: #fff; }
+            #form-section { display: none !important; }
+            #print-section {
+                display: block !important;
+                margin: 0;
+                padding: 15mm 18mm 18mm;
+                width: 210mm;
+                min-height: 297mm;
+            }
+            #print-section .back-btn,
+            #print-section .print-btn { display: none !important; }
+            @page {
+                size: A4;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== FORM SECTION ===== -->
+<div id="form-section">
+    <div class="form-header">
+        <h1>📋 DEPOSIT-V REFUND APPLICATION</h1>
+        <p>Generate a print-ready Dep-V refund application for P.W.D.</p>
+    </div>
+
+    <!-- Contractor Details -->
+    <div class="card">
+        <div class="card-title">Contractor Details</div>
+        <div class="form-grid">
+            <div class="full-width">
+                <label>Firm / Contractor Name</label>
+                <input type="text" id="firmName" value="M/s Nalwaya Construction" placeholder="e.g. M/s Nalwaya Construction">
+            </div>
+            <div class="full-width">
+                <label>Address of the Contractor</label>
+                <textarea id="firmAddress" placeholder="Enter full address of the contractor"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Addressee Details -->
+    <div class="card">
+        <div class="card-title">Addressed To</div>
+        <div class="form-grid">
+            <div class="full-width">
+                <label>Officer Designation</label>
+                <input type="text" id="officer" value="The Executive Engineer, P.W.D., District Division-II, Udaipur (Raj.)">
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Details -->
+    <div class="card">
+        <div class="card-title">Application Details</div>
+        <div class="form-grid">
+            <div>
+                <label>Application Date</label>
+                <input type="date" id="appDate">
+            </div>
+            <div>
+                <label>Letter / Reference No. (optional)</label>
+                <input type="text" id="refNo" placeholder="e.g. NC/Dep-V/2026/01">
+            </div>
+        </div>
+    </div>
+
+    <!-- Works Details -->
+    <div class="card">
+        <div class="card-title">Details of Works (Deposit-V Deducted)</div>
+        <div class="works-table-wrapper">
+            <table class="works-table" id="worksTable">
+                <thead>
+                    <tr>
+                        <th class="sno">S.No.</th>
+                        <th>Voucher No.</th>
+                        <th>Voucher Date</th>
+                        <th>Deposit Amount (₹)</th>
+                        <th>Remaining Amount (₹)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="worksBody">
+                    <!-- Rows added via JS -->
+                </tbody>
+            </table>
+        </div>
+        <button class="btn-add" onclick="addWorkRow()">+ Add Entry</button>
+    </div>
+
+    <!-- Generate Button -->
+    <button class="btn-generate" onclick="generateApplication()">Generate Application ➜</button>
+</div>
+
+<!-- ===== PRINT SECTION ===== -->
+<div id="print-section">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <button class="print-btn" onclick="window.print()">🖨 Print</button>
+    <div id="printContent"></div>
+</div>
+
+<script>
+    let workRowCount = 0;
+
+    // Pre-filled deposit data from records
+    const prefillData = [
+        { vNo: 'V No. 59101', vDate: '2017-03-14', depAmt: 462000, remAmt: 462000 },
+        { vNo: 'V No. 69971', vDate: '2018-03-30', depAmt: 6851, remAmt: 6851 },
+        { vNo: 'V No. 69982', vDate: '2018-03-30', depAmt: 50243, remAmt: 50243 },
+        { vNo: 'V No. 69981', vDate: '2018-03-30', depAmt: 57093, remAmt: 57093 },
+        { vNo: 'V No. 59100', vDate: '2017-03-14', depAmt: 66000, remAmt: 66000 },
+        { vNo: 'V No. 59102', vDate: '2017-03-14', depAmt: 572000, remAmt: 572000 }
+    ];
+
+    // Set default date to today and pre-fill rows
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('appDate').value = today;
+        prefillData.forEach(d => addWorkRow(d));
+    });
+
+    function addWorkRow(data) {
+        workRowCount++;
+        const tbody = document.getElementById('worksBody');
+        const tr = document.createElement('tr');
+        tr.id = 'workRow_' + workRowCount;
+        tr.innerHTML = `
+            <td class="sno">${tbody.children.length + 1}</td>
+            <td><input type="text" placeholder="Voucher No." value="${data ? data.vNo : ''}"></td>
+            <td><input type="date" value="${data ? data.vDate : ''}"></td>
+            <td><input type="number" placeholder="Deposit Amt" step="0.01" value="${data ? data.depAmt : ''}"></td>
+            <td><input type="number" placeholder="Remaining Amt" step="0.01" value="${data ? data.remAmt : ''}"></td>
+            <td><button class="btn-remove" onclick="removeWorkRow(this)">✕</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function removeWorkRow(btn) {
+        const tbody = document.getElementById('worksBody');
+        if (tbody.children.length <= 1) { alert('At least one work row is required.'); return; }
+        btn.closest('tr').remove();
+        // Renumber
+        Array.from(tbody.children).forEach((row, idx) => {
+            row.querySelector('.sno').textContent = idx + 1;
+        });
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '___________';
+        const d = new Date(dateStr);
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+    }
+
+    function formatCurrency(num) {
+        if (isNaN(num) || num === 0) return '—';
+        return '₹ ' + num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function generateApplication() {
+        const firmName = document.getElementById('firmName').value.trim();
+        const firmAddress = document.getElementById('firmAddress').value.trim();
+        const officer = document.getElementById('officer').value.trim();
+        const appDate = document.getElementById('appDate').value;
+        const refNo = document.getElementById('refNo').value.trim();
+
+        if (!firmName) { alert('Please enter the firm / contractor name.'); return; }
+        if (!officer) { alert('Please enter the officer designation.'); return; }
+
+        // Gather works
+        const rows = document.querySelectorAll('#worksBody tr');
+        const works = [];
+        let totalDeposit = 0;
+        let totalRemaining = 0;
+
+        rows.forEach((row) => {
+            const inputs = row.querySelectorAll('input');
+            const vNo = inputs[0].value.trim();
+            const vDate = inputs[1].value;
+            const depAmt = parseFloat(inputs[2].value) || 0;
+            const remAmt = parseFloat(inputs[3].value) || 0;
+
+            if (vNo || depAmt > 0) {
+                works.push({ vNo, vDate, depAmt, remAmt });
+                totalDeposit += depAmt;
+                totalRemaining += remAmt;
+            }
+        });
+
+        if (works.length === 0) { alert('Please add at least one work with details.'); return; }
+
+        // Build the works table rows
+        let worksHTML = '';
+        works.forEach((w, i) => {
+            worksHTML += `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td>${w.vNo || '—'}</td>
+                    <td>${formatDate(w.vDate)}</td>
+                    <td>${w.depAmt > 0 ? formatCurrency(w.depAmt) : '—'}</td>
+                    <td>${w.remAmt > 0 ? formatCurrency(w.remAmt) : '—'}</td>
+                </tr>
+            `;
+        });
+
+        // Ref no line
+        const refLine = refNo ? `<p style="text-align:right;margin-bottom:2px;"><strong>Ref No.:</strong> ${refNo}</p>` : '';
+
+        // Build full letter
+        const html = `
+            ${refLine}
+            <p style="text-align:right;margin-bottom:16px;"><strong>Date:</strong> ${formatDate(appDate)}</p>
+
+            <div class="address-block">
+                <strong>To,</strong>
+                ${officer}
+            </div>
+
+            <div class="address-block" style="margin-top:14px;">
+                <strong>From:</strong><br>
+                ${firmName}<br>
+                ${firmAddress ? firmAddress.replace(/\n/g, '<br>') : '[Address]'}
+            </div>
+
+            <p class="subject-line" style="margin-top:16px;">
+                Subject: Application for the Refund of Deposit-V (Dep-V) amount deducted from running/final bills.
+            </p>
+
+            <p class="body-text" style="margin-top:8px;">
+                <strong>Respected Sir,</strong>
+            </p>
+
+            <p class="body-text">
+                With due respect, the undersigned, <strong>${firmName}</strong>, humbly submits this application for the refund of Deposit-V amounts that were deducted from our running and final bills during the course of the works executed under your esteemed division.
+            </p>
+
+            <p class="body-text">
+                We respectfully state the following for your kind consideration:
+            </p>
+
+            <ol class="points-list">
+                <li><strong>Completion & Handover:</strong> All the concerned works have been duly completed and handed over to the department satisfactorily.</li>
+                <li><strong>Guarantee / Defect Liability Period Expired:</strong> The stipulated guarantee period for all the works mentioned herein has officially expired. No defect has been reported during or after the guarantee period.</li>
+                <li><strong>Nothing Due / No Dues:</strong> There is absolutely nothing due or outstanding against our firm in respect of these works. All obligations have been fully discharged.</li>
+            </ol>
+
+            <p class="body-text">
+                The details of the works along with the Deposit-V amounts deducted are tabulated below for your ready reference:
+            </p>
+
+            <div class="print-title">DEPOSIT REFUND APPLICATION</div>
+
+            <table class="works-print">
+                <thead>
+                    <tr>
+                        <th style="width:35px;">S.No.</th>
+                        <th>Voucher No.</th>
+                        <th>Voucher Date</th>
+                        <th>Deposit Amount (₹)</th>
+                        <th>Remaining Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${worksHTML}
+                    <tr class="total-row">
+                        <td colspan="3" style="text-align:right;">Total:</td>
+                        <td>${formatCurrency(totalDeposit)}</td>
+                        <td>${formatCurrency(totalRemaining)}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="body-text" style="margin-top:16px;">
+                In view of the above facts, it is most humbly requested that the Deposit-V amount totalling <strong>${formatCurrency(totalRemaining)}</strong> may kindly be refunded to the undersigned at the earliest convenience.
+            </p>
+
+            <p class="body-text">
+                We shall be highly obliged for your prompt and favourable action in the matter.
+            </p>
+
+            <div class="closing-block">
+                <p>Thanking you,</p>
+                <div class="signature-block">
+                    <p class="sign-line">Yours faithfully,</p>
+                    <p style="margin-top:50px;"><strong>For ${firmName}</strong></p>
+                    <p style="margin-top:6px;">(Authorized Signatory)</p>
+                    <p style="font-size:10pt;color:#555;">Seal of the Firm</p>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('printContent').innerHTML = html;
+        document.getElementById('form-section').style.display = 'none';
+        document.getElementById('print-section').style.display = 'block';
+    }
+
+    function goBack() {
+        document.getElementById('form-section').style.display = 'block';
+        document.getElementById('print-section').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
