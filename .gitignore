@@ -2,3 +2,19 @@ node_modules
 dist
 .env
 .env.local
+
+# Word temp/lock files
+~$*.docx
+~$*.xlsx
+~$*.pptx
+
+# Debug and log files
+*.log
+debug.log
+
+# Vite cache artefacts
+vite.config.ts.timestamp-*.mjs
+
+# OS junk
+Thumbs.db
+.DS_Store
