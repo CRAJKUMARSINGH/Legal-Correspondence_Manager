@@ -2,13 +2,18 @@
 
 Remote repo: `https://github.com/CRAJKUMARSINGH/Legal-Correspondence_Manager`
 
+> **Environment:** Local Windows dev → GitHub → Netlify auto-deploy. Uses **npm** (not pnpm).
+
 ---
 
 ## First-Time Setup (do once)
 
-### 1. Open the Replit Shell
+### 1. Open a terminal in the project folder
 
-In your Replit project, open the **Shell** tab at the bottom.
+Use PowerShell, VS Code terminal, or any shell, from the project root:
+```
+e:\Rajkumar\Legal-Correspondence_Manager
+```
 
 ### 2. Configure your Git identity
 
@@ -58,14 +63,13 @@ Then push once — Git will save the token for future use.
 
 ## Routine: Push Changes to GitHub
 
-After making changes in Replit (the agent or you):
-
 ```bash
 # 1. Check what has changed
 git status
 
-# 2. Stage all changes
-git add .
+# 2. Stage specific files (preferred) or all changes
+git add src/components/MyFile.tsx
+# or: git add .
 
 # 3. Commit with a meaningful message
 git commit -m "feat: add print/PDF export and reply auto-fill"
@@ -74,20 +78,34 @@ git commit -m "feat: add print/PDF export and reply auto-fill"
 git push origin main
 ```
 
-If your default branch is `master`:
-
-```bash
-git push origin master
-```
-
 ---
 
-## Sync Changes FROM GitHub to Replit (Pull)
+## Sync Changes FROM GitHub (Pull)
 
 If you or a collaborator made changes directly on GitHub:
 
 ```bash
 git pull origin main
+```
+
+After pulling, restore dependencies if `package.json` or `package-lock.json` changed:
+
+```bash
+npm install
+```
+
+> **Note:** This project uses **npm** (not pnpm). There is no monorepo workspace and no database
+> schema to push — all data is stored client-side in IndexedDB (no `DATABASE_URL` needed).
+
+---
+
+## Local Development
+
+```bash
+npm install        # install dependencies
+npm run dev        # start Vite dev server (http://localhost:5173)
+npm run build      # production build (tsc + vite build)
+npm run preview    # preview the production build locally
 ```
 
 ---
@@ -97,7 +115,7 @@ git pull origin main
 ### Push a specific file only
 
 ```bash
-git add artifacts/legal-correspondence/src/pages/reply-letter.tsx
+git add src/components/CorrList.tsx
 git commit -m "fix: auto-fill ref number from incoming despatch"
 git push origin main
 ```
@@ -133,21 +151,27 @@ git add .
 git commit -m "feat: despatch register"
 
 # Push the branch to GitHub
-git push origin feature/despatch-register
+git push -u origin feature/despatch-register
 
 # Then open a Pull Request on GitHub to merge into main
 ```
 
 ---
 
+## Netlify Deployment
+
+Netlify is connected to the `main` branch and auto-deploys on every push.
+
+Build settings (defined in `netlify.toml`):
+- **Build command:** `npm run build`
+- **Publish directory:** `dist`
+
+No manual deploy step is needed — just push to `main`.
+
+---
+
 ## Important Notes
 
-- **Do not** run `pnpm dev` at the workspace root — use the Replit workflow buttons instead.
-- The `DATABASE_URL` secret is Replit-only and is **not** pushed to GitHub — keep it in Replit Secrets.
-- The `.gitignore` already excludes `node_modules/`, `dist/`, and `.env` files.
-- After pulling changes from GitHub, run:
-  ```bash
-  pnpm install
-  pnpm --filter @workspace/db run push
-  ```
-  to restore dependencies and apply any new DB schema changes.
+- The `.gitignore` excludes `node_modules/`, `dist/`, `.env`, `.env.local`, `__pycache__/`, and Word temp files.
+- There is **no** `DATABASE_URL` or backend database — all app data is stored in the user's browser IndexedDB.
+- Never commit `.env` or `.env.local` files — API keys are entered by users at runtime in the Settings modal.

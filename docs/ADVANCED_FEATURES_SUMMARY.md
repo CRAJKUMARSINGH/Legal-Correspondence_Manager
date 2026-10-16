@@ -273,8 +273,8 @@ getErrorRate(): number
 - ✅ **Input validation** - Prevents injection attacks
 - ✅ **Data sanitization** - Clean data processing
 - ✅ **Error handling** - No information leakage
-- ✅ **Storage security** - Encrypted sensitive data
-- ✅ **API security** - Proper authentication
+- ⚠️ **Storage** - Data is stored unencrypted in browser IndexedDB (standard browser security model; suitable for non-sensitive legal metadata)
+- ✅ **API security** - API keys entered by user at runtime; never hardcoded in source
 
 ---
 

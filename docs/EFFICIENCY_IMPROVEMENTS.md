@@ -135,10 +135,10 @@ This document outlines the comprehensive efficiency enhancements implemented in 
 ### Core Libraries Added
 ```json
 {
-  "dexie": "^3.2.4",           // IndexedDB wrapper
-  "fuse.js": "^7.0.0",         // Fuzzy search
-  "react-window": "^1.8.8",    // Virtual scrolling
-  "react-window-infinite-loader": "^1.0.9"  // Infinite loading
+  "dexie": "^4.4.6",           // IndexedDB wrapper (v4)
+  "fuse.js": "^7.5.0",         // Fuzzy search
+  "react-window": "^2.3.4",    // Virtual scrolling (installed, component implemented in VirtualizedCorrespondenceList.tsx)
+  "react-window-infinite-loader": "^2.0.1"  // Infinite loading
 }
 ```
 

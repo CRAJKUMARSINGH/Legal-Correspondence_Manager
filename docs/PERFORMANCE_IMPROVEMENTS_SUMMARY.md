@@ -7,6 +7,8 @@
 **Solution**: Implemented Map/Set for O(1) lookups and proper upsert logic
 **Files Modified**: `src/store.ts`
 
+> **What is Luminaire?** Luminaire Docs is an optional external API (`src/lib/luminaireApi.ts`) that can sync cases and correspondence. It is not required — the app works fully offline with browser IndexedDB storage.
+
 **Key Changes**:
 - Replaced `cases.find()` with `Map` for O(1) lookups
 - Added proper upsert logic with timestamp comparison
@@ -96,8 +98,10 @@
 ### ✅ 6. **Removed Duplicate Legacy Files**
 **Problem**: Multiple versions of same components caused confusion
 **Solution**: Consolidated to single production versions
-**Files Removed**: `CorrespondenceList.tsx`, `DraftModal.tsx`, `aiDraft.ts`
-**Files Renamed**: `DraftModalV2.tsx` → `DraftModal.tsx`, `aiDraftV2.ts` → `aiDraft.ts`
+**Files Removed**: `CorrespondenceList.tsx`, legacy `aiDraft.ts` (old version)
+**Files Renamed**: `DraftModalV2.tsx` → `DraftModal.tsx` (current production file), `aiDraftV2.ts` → `aiDraft.ts`
+
+> Note: `DraftModal.tsx` **still exists** — it is the production component. The `V2` suffix was dropped during consolidation.
 
 **Maintenance Impact**:
 - Reduced codebase complexity
