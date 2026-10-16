@@ -1,6 +1,17 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@reference "tailwindcss";
+
+@theme {
+  --font-family-sans: 'Inter', 'Noto Sans Devanagari', sans-serif;
+  --font-family-devanagari: 'Noto Sans Devanagari', sans-serif;
+  
+  --color-legal-50: #f0f4ff;
+  --color-legal-100: #e0e9ff;
+  --color-legal-600: #2d4a8a;
+  --color-legal-700: #1e3570;
+  --color-legal-800: #152860;
+  --color-legal-900: #0d1b45;
+}
 
 @layer base {
   body {
@@ -40,4 +51,109 @@
   .font-devanagari {
     font-family: 'Noto Sans Devanagari', sans-serif;
   }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DOCUMENT / PRINT LAYOUT
+   Ported from PWD-TOOLS-PRIYANKA-MONOREPO (artifacts/pwd-tools/src/index.css)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* A4 page wrapper — used in live previews (DraftModal, template previews) */
+@media screen {
+  .a4-page {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 15mm;
+    background: white;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px -6px rgb(0 0 0 / 0.18), 0 4px 8px -4px rgb(0 0 0 / 0.10);
+    color: black;
+  }
+}
+
+/* Global @page rule — A4 portrait, 15mm margins, no browser header/footer injection */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin-top: 15mm;
+    margin-bottom: 15mm;
+    margin-left: 15mm;
+    margin-right: 15mm;
+    marks: none;
+  }
+
+  body,
+  html {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide form panels, toolbars, nav when printing */
+  .hide-on-print {
+    display: none !important;
+  }
+
+  /* A4 page resets for print — remove shadows/padding added for screen */
+  .a4-page {
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: black !important;
+  }
+}
+
+/* ── Document-specific font and colour helpers ────────────────────────────── */
+
+/* Force Arial for all official document output (matches monorepo contractor-output) */
+.doc-font {
+  font-family: Arial, Helvetica, sans-serif !important;
+  color: black !important;
+}
+
+/* Force Mangal/Noto for Hindi official documents */
+.doc-font-hindi {
+  font-family: 'Mangal', 'Noto Sans Devanagari', 'Nirmala UI', 'Arial Unicode MS', sans-serif !important;
+  color: black !important;
+}
+
+/* Black borders for official tables */
+.doc-border-black {
+  border-color: black !important;
+}
+
+/* Grey header cells in official tables */
+.doc-bg-gray {
+  background-color: #e8e8e8 !important;
+}
+
+/* ── contractor-output ────────────────────────────────────────────────────────
+   Collapses all margins for pixel-perfect print fidelity.
+   Apply to the root element of any document preview or generated output.  */
+.contractor-output,
+.contractor-output * {
+  line-height: 1 !important;
+}
+
+.contractor-output p,
+.contractor-output h1,
+.contractor-output h2,
+.contractor-output h3,
+.contractor-output div,
+.contractor-output table {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Suppress any injected header/footer elements inside document output */
+.contractor-output header,
+.contractor-output footer {
+  display: none !important;
 }

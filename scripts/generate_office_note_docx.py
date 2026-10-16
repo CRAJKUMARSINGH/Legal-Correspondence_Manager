@@ -34,6 +34,13 @@ SUBJECT_PREFIX = "MB-Withdrawal-DD2-BAD-PR-25-26-6"
 
 # ── Colour palette ────────────────────────────────────────────────────────────
 MANGAL = "Mangal"
+
+# ── Page layout constants (aligned with PWD-TOOLS-PRIYANKA-MONOREPO) ─────────
+# Monorepo uses 15mm uniform margins; official docs use 30mm left.
+PAGE_MARGIN_TOP    = Cm(1.5)   # 15 mm
+PAGE_MARGIN_BOTTOM = Cm(1.5)   # 15 mm
+PAGE_MARGIN_LEFT   = Cm(3.0)   # 30 mm — wider left for official documents
+PAGE_MARGIN_RIGHT  = Cm(2.0)   # 20 mm
 BLUE   = RGBColor(0x00, 0x35, 0x80)
 RED    = RGBColor(0xCC, 0x00, 0x00)
 BLACK  = RGBColor(0x1A, 0x1A, 0x1A)

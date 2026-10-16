@@ -140,7 +140,6 @@ export function useSearch() {
     if (searchOptions.caseStatus && searchOptions.caseStatus.length > 0) {
       filtered = filtered.filter(result => {
         if (result.type === 'case') {
-          const case_ = result.item as Case
           // Assuming cases might have a status field or we derive it from correspondence
           return true // No status filter for cases currently
         }

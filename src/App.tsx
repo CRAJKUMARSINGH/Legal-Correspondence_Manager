@@ -7,6 +7,8 @@ import CaseManager from './components/CaseManager'
 import CorrespondenceList from './components/CorrList'
 import Timeline from './components/Timeline'
 import SettingsModal from './components/SettingsModal'
+import OutputToast from './components/OutputToast'
+import { useOutputNotification } from './hooks/useOutputNotification'
 
 export default function App() {
   const { settings, saveSettings } = useSettings()
@@ -17,6 +19,9 @@ export default function App() {
   const { cases, addCase, updateCase, deleteCase } = useCases()
   const { items, addItem, updateItem, deleteItem } = useCorrespondence()
   const { sync, syncing, lastSync, syncError } = useLuminaireSync(cases, addCase, updateCase, items, addItem, updateItem)
+
+  // ── Output notification (shown after any document is generated) ──────────
+  const { notifications, notify, dismiss } = useOutputNotification()
 
   const toggleLang = () => setLang(l => l === 'en' ? 'hi' : 'en')
 
@@ -50,6 +55,7 @@ export default function App() {
             onAdd={addItem}
             onUpdate={updateItem}
             onDelete={deleteItem}
+            onNotify={notify}
           />
         )}
         {activeTab === 'timeline' && (
@@ -65,6 +71,9 @@ export default function App() {
           onClose={() => setShowSettings(false)}
         />
       )}
+
+      {/* Output notification toast — appears after any document is generated */}
+      <OutputToast notifications={notifications} onDismiss={dismiss} />
     </div>
   )
 }

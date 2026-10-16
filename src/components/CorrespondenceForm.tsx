@@ -20,7 +20,7 @@ export default function CorrespondenceForm({ cases, onSave, onCancel, lang, init
     subject_hi: initial?.subject_hi ?? '',
     type: (initial?.type ?? 'notice') as CorrespondenceType,
     status: (initial?.status ?? 'sent') as Status,
-    date: initial?.date ?? new Date().toISOString().split('T')[0],
+    date: initial?.date ?? (new Date().toISOString().split('T')[0] as string),
     dueDate: initial?.dueDate ?? '',
     from: initial?.from ?? '',
     to: initial?.to ?? '',

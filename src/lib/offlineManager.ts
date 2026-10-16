@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react'
-import { StorageService } from './storage'
-import type { Case, Correspondence } from '../types'
 
 export interface QueuedAction {
   id: string

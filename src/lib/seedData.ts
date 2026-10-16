@@ -39,10 +39,9 @@ export const SEED_CASE: Omit<Case, 'id' | 'createdAt'> & { id: string; createdAt
 }
 
 export function buildSeedCorrespondence(caseId: string): (Omit<Correspondence, 'createdAt' | 'updatedAt'> & { id: string })[] {
-  const now = '2023-07-17T00:00:00.000Z'
   return [
     {
-      id: SEED_CORR_IDS[0],
+      id: SEED_CORR_IDS[0] ?? crypto.randomUUID(),
       caseId,
       subject: 'Written Order to Commence Work — Amli Fala Bridge Construction',
       type: 'order',
@@ -88,7 +87,7 @@ PWD Dn Dungarpur`,
       luminaireId: 'a2ccae0c-c32d-4975-88ac-8a35ec14ec75',
     },
     {
-      id: SEED_CORR_IDS[1],
+      id: SEED_CORR_IDS[1] ?? crypto.randomUUID(),
       caseId,
       subject: 'Forest Clearance (Van Bhoomi Hastantaran) and Hindrances Register Update',
       subject_hi: 'वन भूमि हस्तांतरण एन.ओ.सी. एवं हिंदरेंस रजिस्टर अपडेट',
@@ -124,7 +123,7 @@ PWD Dn Dungarpur`,
       luminaireId: '4b020309-f7a0-4d15-89d2-288fa2677661',
     },
     {
-      id: SEED_CORR_IDS[2],
+      id: SEED_CORR_IDS[2] ?? crypto.randomUUID(),
       caseId,
       subject: 'Construction Program Progress and Pending Payment Issue',
       subject_hi: 'निर्माण कार्यक्रम की प्रगति एवं भुगतान लंबित होने के संबंध में',
@@ -160,7 +159,7 @@ PWD Dn Dungarpur`,
       luminaireId: 'e6f4cdba-2418-4750-a48e-464e84855346',
     },
     {
-      id: SEED_CORR_IDS[3],
+      id: SEED_CORR_IDS[3] ?? crypto.randomUUID(),
       caseId,
       subject: 'Strengthening and Widening of BT Road — Reasons for Delay and Objection to Work Withdrawal',
       subject_hi: 'सड़क निर्माण कार्य में विलंब के कारण एवं कार्य वापसी के विरुद्ध आपत्ति',

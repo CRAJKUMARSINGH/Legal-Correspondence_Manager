@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
 import { fetchLuminaireCases, fetchLuminaireCorrespondence } from './luminaireApi'
-import { offlineManager } from './offlineManager'
-import type { Case, Correspondence } from '../types'
 import type { LuminaireCase, LuminaireCorrespondence } from './luminaireApi'
 
 export interface WebhookConfig {

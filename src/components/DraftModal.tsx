@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { X, Wand2, Copy, Check, RefreshCw, Printer, ChevronDown, ChevronUp } from 'lucide-react'
+import { X, Wand2, Copy, Check, RefreshCw, Printer, ChevronDown, ChevronUp, FileDown } from 'lucide-react'
 import type { Correspondence, Case, Lang, DraftRequest } from '../types'
 import { t } from '../i18n'
 import { generateDraft } from '../lib/aiDraft'
+import type { NotifyOptions } from '../hooks/useOutputNotification'
 
 interface Props {
   type: DraftRequest['type']
@@ -13,6 +14,7 @@ interface Props {
   apiKey: string
   onClose: () => void
   onUseDraft: (text: string) => void
+  onNotify?: (opts: NotifyOptions) => void
 }
 
 const TYPE_LABELS: Record<DraftRequest['type'], { en: string; hi: string }> = {
@@ -23,7 +25,7 @@ const TYPE_LABELS: Record<DraftRequest['type'], { en: string; hi: string }> = {
   improve:        { en: 'Improve Letter',        hi: 'पत्र में सुधार करें' },
 }
 
-export default function DraftModal({ type, correspondence, letterChain, caseInfo, lang, apiKey, onClose, onUseDraft }: Props) {
+export default function DraftModal({ type, correspondence, letterChain, caseInfo, lang, apiKey, onClose, onUseDraft, onNotify }: Props) {
   const [draftLang, setDraftLang] = useState<Lang>(lang)
   const [context, setContext] = useState('')
   const [amount, setAmount] = useState(correspondence?.amount?.toString() ?? '')
@@ -86,16 +88,163 @@ export default function DraftModal({ type, correspondence, letterChain, caseInfo
     setTimeout(() => setCopied(false), 2000)
   }
 
+  // Builds a standalone A4 HTML document matching monorepo print standards
+  const buildPrintHtml = (content: string, isHindi: boolean): string => {
+    const fontFamily = isHindi
+      ? "'Mangal', 'Noto Sans Devanagari', 'Nirmala UI', 'Arial Unicode MS', sans-serif"
+      : "'Times New Roman', 'Georgia', serif"
+    const escaped = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    return `<!DOCTYPE html>
+<html lang="${isHindi ? 'hi' : 'en'}"
+      xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8"/>
+<title>Legal Letter — PWD District Div-II Udaipur</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: A4 portrait;
+    margin-top: 15mm;
+    margin-bottom: 15mm;
+    margin-left: 30mm;   /* wider left — official doc standard */
+    margin-right: 20mm;
+    marks: none;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    font-family: ${fontFamily};
+    font-size: 13pt;
+    line-height: 1.9;
+    color: #1a1a1a;
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .wrap {
+    max-width: 165mm;
+    margin: 0 auto;
+  }
+  /* Office header — centred, bold */
+  .office-header {
+    text-align: center;
+    margin-bottom: 18px;
+    border-bottom: 2px solid #003580;
+    padding-bottom: 10px;
+  }
+  .office-header .office-name {
+    font-size: 14pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #003580;
+  }
+  .office-header .dept-name {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 3px;
+    color: #003580;
+  }
+  /* क्रमांक / दिनांक row */
+  .ref-date-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    font-size: 12pt;
+  }
+  /* Addressee block */
+  .addressee {
+    margin-bottom: 16px;
+    font-size: 12pt;
+  }
+  /* विषय / सन्दर्भ lines */
+  .subject-line {
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 12pt;
+  }
+  .ref-line {
+    margin-bottom: 16px;
+    font-size: 12pt;
+  }
+  /* Body paragraphs */
+  p {
+    text-align: justify;
+    margin-bottom: 10px;
+    font-size: 13pt;
+    line-height: 1.9;
+  }
+  pre {
+    font-family: inherit;
+    white-space: pre-wrap;
+    font-size: 13pt;
+    line-height: 1.9;
+    text-align: justify;
+    margin: 0;
+  }
+  /* Signature block — right aligned with 40px spacer */
+  .signature-block {
+    margin-top: 32px;
+    text-align: right;
+  }
+  .signature-block .spacer { height: 40px; }
+  .signature-block .sig-name { font-weight: bold; }
+  .signature-block .sig-desig { font-size: 11pt; }
+  /* CC / प्रतिलिपि section */
+  .cc-section {
+    margin-top: 24px;
+    font-size: 11pt;
+    border-top: 1px solid #aaa;
+    padding-top: 10px;
+  }
+  /* Hide screen-only elements */
+  .hide-on-print { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap contractor-output">
+<pre>${escaped}</pre>
+</div>
+</body>
+</html>`
+  }
+
   const handlePrint = () => {
     const win = window.open('', '_blank')
     if (!win) return
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Legal Letter</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
-    <style>body{font-family:'Times New Roman',serif;max-width:700px;margin:40px auto;padding:20px;line-height:1.8;font-size:14px}
-    pre{font-family:inherit;white-space:pre-wrap}.hi{font-family:'Noto Sans Devanagari',sans-serif}</style>
-    </head><body><pre class="${draftLang === 'hi' ? 'hi' : ''}">${draft.replace(/</g, '&lt;')}</pre></body></html>`)
+    win.document.write(buildPrintHtml(draft, draftLang === 'hi'))
     win.document.close()
-    setTimeout(() => win.print(), 400)
+    const filename = `${(caseInfo?.title ?? 'legal-letter').slice(0, 60)}.pdf (Print)`
+    setTimeout(() => {
+      win.print()
+      onNotify?.({ filename })
+    }, 500)
+  }
+
+  // Export as .doc (Word-compatible HTML blob) — monorepo pattern
+  const handleExportWord = () => {
+    const html = buildPrintHtml(draft, draftLang === 'hi')
+    const safeTitle = (caseInfo?.title ?? 'legal-letter')
+      .replace(/[^a-zA-Z0-9\u0900-\u097F _-]/g, '')
+      .trim()
+      .slice(0, 60) || 'legal-letter'
+    const filename = `${safeTitle}.doc`
+    const blob = new Blob(['\ufeff', html], { type: 'application/msword' })
+    const blobUrl = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = blobUrl
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    setTimeout(() => {
+      URL.revokeObjectURL(blobUrl)
+      onNotify?.({ filename })
+    }, 500)
   }
 
   const label = TYPE_LABELS[type][lang === 'hi' ? 'hi' : 'en']
@@ -235,6 +384,9 @@ export default function DraftModal({ type, correspondence, letterChain, caseInfo
                   </button>
                   <button onClick={handlePrint} className="flex items-center gap-1 text-xs px-3 py-1 bg-legal-700 text-white rounded-md hover:bg-legal-600">
                     <Printer className="w-3 h-3" /> Print
+                  </button>
+                  <button onClick={handleExportWord} className="flex items-center gap-1 text-xs px-3 py-1 bg-emerald-700 text-white rounded-md hover:bg-emerald-800">
+                    <FileDown className="w-3 h-3" /> Word
                   </button>
                 </div>
               </div>

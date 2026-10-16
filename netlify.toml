@@ -2,6 +2,17 @@
   command   = "npm run build"
   publish   = "dist"
 
+# ── Static document assets (/docs/*) ─────────────────────────────────────────
+# Files placed in public/docs/ are copied verbatim to dist/docs/ by Vite.
+# They are served directly by Netlify's CDN without hitting the SPA redirect.
+[[headers]]
+  for = "/docs/*"
+  [headers.values]
+    Cache-Control        = "public, max-age=86400, stale-while-revalidate=604800"
+    X-Content-Type-Options = "nosniff"
+    Content-Disposition  = "inline"
+
+# ── SPA fallback (all other routes → React app) ───────────────────────────────
 [[redirects]]
   from   = "/*"
   to     = "/index.html"

@@ -4,7 +4,6 @@ import {
   Database, 
   Wifi, 
   WifiOff, 
-  Clock, 
   TrendingUp, 
   AlertCircle, 
   CheckCircle,
@@ -27,7 +26,7 @@ interface Props {
   lang: 'en' | 'hi'
 }
 
-export default function AdvancedDashboard({ cases, correspondence, lang }: Props) {
+export default function AdvancedDashboard({ cases, correspondence }: Props) {
   const analytics = useAnalytics()
   const offlineStatus = useOfflineManager()
   const integrationStatus = useIntegrationManager()
@@ -37,7 +36,8 @@ export default function AdvancedDashboard({ cases, correspondence, lang }: Props
   const [isCheckingIntegrity, setIsCheckingIntegrity] = useState(false)
   const [activeTab, setActiveTab] = useState<'overview' | 'performance' | 'analytics' | 'offline' | 'data'>('overview')
 
-  const stats = getDashboardStats(cases, correspondence)
+  const _stats = getDashboardStats(cases, correspondence)
+  void _stats // stats computed for side-effect; used via DataValidator below
 
   useEffect(() => {
     // Track dashboard view

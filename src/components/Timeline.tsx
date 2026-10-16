@@ -62,7 +62,7 @@ export default function Timeline({ items, cases, lang }: Props) {
               {/* Vertical line */}
               <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
               <div className="space-y-4">
-                {caseItems.map((item, idx) => (
+                {caseItems.map((item) => (
                   <div key={item.id} className="relative flex gap-4 pl-10">
                     {/* Dot */}
                     <div className={`absolute left-3 top-2 w-3 h-3 rounded-full border-2 border-white ${statusDot[item.status]} z-10`} />

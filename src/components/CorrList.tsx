@@ -17,6 +17,7 @@ interface Props {
   onAdd: (item: Omit<Correspondence, 'id' | 'createdAt' | 'updatedAt'>) => void
   onUpdate: (id: string, updates: Partial<Correspondence>) => void
   onDelete: (id: string) => void
+  onNotify?: (opts: import('../hooks/useOutputNotification').NotifyOptions) => void
 }
 
 const SC: Record<string, string> = {
@@ -43,7 +44,7 @@ const TC: Record<string, string> = {
 
 const ALL: Status[] = ['sent', 'pending_reply', 'replied', 'escalated', 'resolved', 'overdue', 'draft']
 
-export default function CorrList({ items, cases, lang, apiKey, onAdd, onUpdate, onDelete }: Props) {
+export default function CorrList({ items, cases, lang, apiKey, onAdd, onUpdate, onDelete, onNotify }: Props) {
   const [showForm, setShowForm] = useState(false)
   const [editItem, setEditItem] = useState<Correspondence | null>(null)
   const [viewItem, setViewItem] = useState<Correspondence | null>(null)
@@ -176,6 +177,7 @@ export default function CorrList({ items, cases, lang, apiKey, onAdd, onUpdate, 
           lang={lang}
           apiKey={apiKey}
           onClose={() => setDraftItem(null)}
+          onNotify={onNotify}
           onUseDraft={text => {
             if (!draftItem) return
             if (draftType === 'improve') {
@@ -187,7 +189,7 @@ export default function CorrList({ items, cases, lang, apiKey, onAdd, onUpdate, 
                 subject: (draftType === 'escalation' ? 'ESCALATION: ' : '') + draftItem.subject,
                 type: (draftType === 'fresh_notice' ? 'notice' : draftType) as any,
                 status: 'draft',
-                date: new Date().toISOString().split('T')[0],
+                date: new Date().toISOString().split('T')[0] as string,
                 from: draftItem.from,
                 to: draftItem.to,
                 body: text,

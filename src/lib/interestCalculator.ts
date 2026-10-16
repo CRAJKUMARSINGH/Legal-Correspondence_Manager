@@ -317,7 +317,7 @@ Generated on: ${format(new Date(), 'PPP')}
     let totalCompoundInterest = 0
     const allBreakdowns: DailyBreakdown[] = []
 
-    periods.forEach((period, index) => {
+    periods.forEach((period, _index) => {
       const calculation = this.calculateInterest(
         currentPrincipal,
         period.rate,
@@ -341,6 +341,9 @@ Generated on: ${format(new Date(), 'PPP')}
 
     const firstPeriod = periods[0]
     const lastPeriod = periods[periods.length - 1]
+    if (!firstPeriod || !lastPeriod) {
+      return { principal, rate: 0, startDate: '', endDate: '', days: 0, simpleInterest: 0, compoundInterest: 0, totalAmount: principal, breakdown: [] }
+    }
     const totalDays = differenceInDays(parseISO(lastPeriod.endDate), parseISO(firstPeriod.startDate))
 
     return {

@@ -5,7 +5,7 @@ import App from './App'
 import { resetWithBackup, getStorageInfo } from './lib/dataReset'
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: string | null; resetting: boolean }> {
-  state = { error: null, resetting: false }
+  override state = { error: null as string | null, resetting: false }
   static getDerivedStateFromError(e: Error) { return { error: e.message, resetting: false } }
 
   handleReset = async () => {
@@ -24,7 +24,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
     }
   }
 
-  render() {
+  override render(): ReactNode {
     if (this.state.error) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-8">

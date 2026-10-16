@@ -291,7 +291,7 @@ export function useShortcutHelp(shortcuts: KeyboardShortcut[]) {
       if (!categories[shortcut.category]) {
         categories[shortcut.category] = []
       }
-      categories[shortcut.category].push(shortcut)
+      categories[shortcut.category]!.push(shortcut)
     })
     
     return categories

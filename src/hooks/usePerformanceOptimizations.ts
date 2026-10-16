@@ -19,7 +19,7 @@ export function useCaseMap(cases: Case[]) {
 // Memoized correspondence filtering with deferred search
 export function useFilteredCorrespondence(
   correspondence: Correspondence[],
-  cases: Case[],
+  _cases: Case[],
   searchQuery: string,
   selectedCaseId?: string,
   selectedType?: CorrespondenceType,
@@ -27,7 +27,6 @@ export function useFilteredCorrespondence(
 ) {
   // Defer search query to prevent blocking UI during typing
   const deferredSearchQuery = useDeferredValue(searchQuery)
-  const caseMap = useCaseMap(cases)
 
   const filteredItems = useMemo(() => {
     let filtered = correspondence

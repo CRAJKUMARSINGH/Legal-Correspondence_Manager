@@ -290,7 +290,7 @@ Sincerely,
         const oldestDraft = Array.from(this.drafts.values())
           .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())[0]
         
-        this.drafts.delete(oldestDraft.id)
+        if (oldestDraft) this.drafts.delete(oldestDraft.id)
       }
 
       const newDraft: CachedDraft = {

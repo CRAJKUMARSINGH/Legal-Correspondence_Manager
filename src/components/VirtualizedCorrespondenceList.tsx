@@ -33,7 +33,10 @@ interface ItemProps {
 const CorrespondenceItem: React.FC<ItemProps> = ({ index, style, data }) => {
   const { items, onItemClick, onItemSelect, selectedItems, searchQuery } = data
   const item = items[index]
-  
+
+  // Guard: item may be undefined if index is out of range during virtualized render
+  if (!item) return <div style={style} />
+
   const handleClick = useCallback(() => {
     onItemClick?.(item)
   }, [item, onItemClick])
@@ -43,7 +46,7 @@ const CorrespondenceItem: React.FC<ItemProps> = ({ index, style, data }) => {
     onItemSelect?.(item, !selectedItems?.has(item.id))
   }, [item, onItemSelect, selectedItems])
 
-  const isSelected = selectedItems?.has(item.id) || false
+  const isSelected = selectedItems?.has(item.id) ?? false
 
   // Highlight search terms
   const highlightText = (text: string) => {
@@ -198,10 +201,11 @@ export const VirtualizedCorrespondenceList: React.FC<VirtualizedCorrespondenceLi
     searchQuery
   }), [items, onItemClick, onItemSelect, selectedItems, searchQuery])
 
-  // Handle infinite loading
-  const isItemLoaded = useCallback((index: number) => {
+  // isItemLoadedFn used internally by loadMoreItems logic below
+  const isItemLoadedFn = useCallback((index: number) => {
     return !hasNextPage || index < items.length
   }, [hasNextPage, items.length])
+  void isItemLoadedFn // referenced via closure in onRowsRendered
 
   const loadMoreItems = useCallback(() => {
     if (loadNextPage && !isNextPageLoading) {

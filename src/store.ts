@@ -5,9 +5,8 @@ import type { LuminaireCase, LuminaireCorrespondence } from './lib/luminaireApi'
 import { SEED_CASE, SEED_CASE_ID, buildSeedCorrespondence } from './lib/seedData'
 import { StorageService, debounce } from './lib/storage'
 
-const CASES_KEY = 'lcm_cases'
-const CORR_KEY = 'lcm_correspondence'
-const SETTINGS_KEY = 'lcm_settings'
+// Legacy localStorage key names kept as comments for migration reference
+// CASES_KEY = 'lcm_cases', CORR_KEY = 'lcm_correspondence', SETTINGS_KEY = 'lcm_settings'
 
 export interface Settings {
   apiKey: string
@@ -234,7 +233,7 @@ function mapLuminaireCorrespondence(
     subject: lc.subject,
     type,
     status,
-    date: (lc.sent_at ?? lc.created_at).split('T')[0],
+    date: ((lc.sent_at ?? lc.created_at ?? new Date().toISOString()).split('T')[0] as string),
     from: `${lc.sender.name}${lc.sender.designation ? ` (${lc.sender.designation})` : ''}`,
     to: lc.recipients.map(r => `${r.name}${r.designation ? ` (${r.designation})` : ''}`).join('; '),
     cc: lc.cc.map(c => c.name),

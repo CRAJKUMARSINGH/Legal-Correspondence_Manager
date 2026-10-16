@@ -11,16 +11,16 @@ interface Props {
   onClose: () => void
 }
 
-export default function QuickReply({ parent, caseInfo, lang, onSave, onClose }: Props) {
+export default function QuickReply({ parent, lang, onSave, onClose }: Omit<Props, 'caseInfo'> & { caseInfo?: Case }) {
   const [type, setType] = useState<CorrespondenceType>('reply')
   const [subject, setSubject] = useState(`Re: ${parent.subject}`)
   const [body, setBody] = useState('')
   const [body_hi, setBodyHi] = useState('')
   const [refNo, setRefNo] = useState('')
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0] as string)
 
   // Swap from/to for reply
-  const replyFrom = parent.to.split(';')[0].trim()
+  const replyFrom = (parent.to.split(';')[0] ?? '').trim()
   const replyTo = parent.from
 
   const handleSave = () => {

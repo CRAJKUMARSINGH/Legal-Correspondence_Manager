@@ -1,66 +1,299 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
 <head>
-<meta charset="UTF-8">
-<title>Deposit-V Refund Application – Template</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Deposit-V Refund Application – Template | P.W.D. District Div-II Udaipur</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-    body {font-family: 'Noto Sans', Arial, sans-serif; background:#f9f9f9; margin:0; padding:20px; color:#2c3e50;}
-    .container {max-width:800px; margin:auto; background:#fff; padding:40px; box-shadow:0 6px 15px rgba(0,0,0,0.1); border-radius:8px;}
-    h1 {text-align:center; margin-bottom:30px; color:#1a73e8; font-size: 24px;}
-    .field {margin-bottom:12px; line-height:1.6;}
-    .field strong {display:inline-block; width:80px;}
-    .subject {font-weight:bold; margin-top:20px; margin-bottom: 20px;}
-    p {line-height:1.6;}
-    table {width:100%; border-collapse:collapse; margin:20px 0;}
-    th, td {border:1px solid #ddd; padding:10px; text-align:center;}
-    th {background:#eaeaea;}
-    .total {font-weight:bold; background:#f0f0f0;}
-    .footer {margin-top:40px;}
-    .signature {margin-top:60px;}
+  /* ── @page ── */
+  @page {
+    size: A4 portrait;
+    margin-top: 15mm;
+    margin-bottom: 15mm;
+    margin-left: 30mm;
+    margin-right: 20mm;
+    marks: none;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    font-family: 'Times New Roman', 'Noto Sans', serif;
+    font-size: 13pt;
+    line-height: 1.7;
+    color: #000;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── A4 screen preview ── */
+  .a4-page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 18mm auto;
+    padding: 22mm 20mm 22mm 30mm;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    color: #000;
+  }
+
+  /* ── Office header ── */
+  .office-header {
+    text-align: center;
+    margin-bottom: 18px;
+    border-bottom: 2px solid #003580;
+    padding-bottom: 10px;
+  }
+  .office-header .office-name {
+    font-size: 14pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #003580;
+  }
+  .office-header .dept-name {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 3px;
+    color: #003580;
+  }
+
+  /* ── From / To block ── */
+  .address-block {
+    margin-bottom: 10px;
+    font-size: 12pt;
+    line-height: 1.6;
+  }
+
+  /* ── Ref-No / Date row ── */
+  .ref-date-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 14px 0;
+    font-size: 12pt;
+  }
+
+  hr.divider {
+    border: none;
+    border-top: 2px solid #003580;
+    margin: 14px 0;
+  }
+  hr.thin {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 12px 0;
+  }
+
+  /* ── Subject / salutation ── */
+  .subject-line {
+    font-weight: bold;
+    margin: 14px 0 8px 0;
+    font-size: 12pt;
+    text-decoration: underline;
+  }
+
+  /* ── Body paragraphs ── */
+  p {
+    text-align: justify;
+    margin-bottom: 10px;
+    font-size: 13pt;
+    line-height: 1.8;
+  }
+
+  /* ── Works table ── */
+  table.works-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 11pt;
+  }
+  table.works-table th,
+  table.works-table td {
+    border: 1px solid #000;
+    padding: 5px 8px;
+    text-align: center;
+    vertical-align: top;
+  }
+  table.works-table th {
+    background: #f0f0f0;
+    font-weight: bold;
+    font-size: 10.5pt;
+  }
+  table.works-table .total-row {
+    font-weight: bold;
+    background: #f7f7f7;
+  }
+
+  /* ── Numbered list ── */
+  ol {
+    margin: 8px 0 10px 22px;
+    line-height: 1.8;
+    font-size: 12pt;
+  }
+  li { margin-bottom: 5px; }
+
+  /* ── Closing ── */
+  .closing-block {
+    margin-top: 20px;
+    font-size: 12pt;
+  }
+
+  /* ── Signature block ── */
+  .signature-block {
+    margin-top: 50px;
+    font-size: 12pt;
+  }
+  .signature-block .spacer { height: 40px; }
+  .sig-label { font-weight: bold; color: #003580; }
+  .sig-blank {
+    display: inline-block;
+    min-width: 180px;
+    border-bottom: 1px solid #555;
+  }
+
+  /* ── CC section ── */
+  .cc-section {
+    margin-top: 24px;
+    font-size: 11pt;
+    border-top: 1px solid #aaa;
+    padding-top: 10px;
+  }
+
+  /* ── Print overrides ── */
+  @media print {
+    body { background: #fff; }
+    .a4-page {
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+      width: auto;
+      min-height: 0;
+    }
+    .hide-on-print { display: none !important; }
+  }
 </style>
 </head>
 <body>
-<div class="container">
-<h1>Deposit-V Refund Application</h1>
-<div class="field"><strong>From:</strong> [Contractor Name]<br><strong>Address:</strong> [Contractor Address]</div>
-<div class="field"><strong>Date:</strong> [DD-MM-YYYY]</div>
-<div class="field"><strong>To:</strong> Executive Engineer, Public Works Department,<br> District Division-II, Udaipur (Raj.)</div>
-<div class="subject">Subject: Application for refund of Deposit-V (Dep-V) deducted from running/final bills</div>
-<p><strong>Sir/Madam,</strong></p>
-<p>We, <em>[Contractor Name]</em>, have successfully completed the works assigned by your department. During the execution, Deposit-V amounts were deducted from our running and final bills.</p>
-<p>Below are the details of the vouchers for which we request a refund:</p>
-<table>
-<thead>
-<tr>
-<th>Sr.No.</th>
-<th>Voucher No.</th>
-<th>Voucher Date</th>
-<th>Deposit Amount (₹)</th>
-<th>Remaining Amount (₹)</th>
-</tr>
-</thead>
-<tbody>
-<tr><td>1</td><td>[Number]</td><td>[Date]</td><td>₹ 0.00</td><td>₹ 0.00</td></tr>
-<tr class="total"><td colspan="3">Total</td><td>₹ 0.00</td><td>₹ 0.00</td></tr>
-</tbody>
-</table>
-<p><strong>Reasons for refund:</strong></p>
-<ol style="line-height:1.6;">
-<li>All works have been successfully completed and handed over.</li>
-<li>The guarantee/defect liability period has expired.</li>
-<li>No dues are pending against us.</li>
-</ol>
-<p>Therefore, we kindly request the release of the Deposit-V amount of <strong>₹ [Amount]</strong> (Rupees [Amount in Words] only) at the earliest. We would be grateful for your prompt and favorable action.</p>
-<div class="footer">
-<p>Thanking you,</p>
-</div>
-<div class="signature">
-<p><strong>Yours faithfully,</strong></p>
-<p><strong>[Contractor Name]</strong></p>
-<p style="margin-top:50px;">(Signature)</p>
-<p><strong>Authorized Signatory</strong></p>
-<p style="color:#777; font-size: 14px;">[Company Seal]</p>
-</div>
+<div class="a4-page contractor-output doc-font">
+
+  <!-- ── Office Header ── -->
+  <div class="office-header">
+    <div class="office-name">Office of the Executive Engineer</div>
+    <div class="dept-name">P.W.D. District Division-II, Udaipur (Raj.)</div>
+  </div>
+
+  <!-- ── From / Date ── -->
+  <div class="address-block">
+    <strong>From:</strong><br/>
+    [Contractor Name]<br/>
+    [Contractor Address]<br/>
+    [City, PIN]
+  </div>
+
+  <div class="ref-date-row">
+    <div><strong>Ref. No.:</strong> [Letter No.]</div>
+    <div><strong>Date:</strong> [DD-MM-YYYY]</div>
+  </div>
+
+  <!-- ── Addressee ── -->
+  <div class="address-block">
+    <strong>To,</strong><br/>
+    The Executive Engineer,<br/>
+    Public Works Department,<br/>
+    District Division-II, Udaipur (Raj.)
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- ── Subject ── -->
+  <div class="subject-line">
+    Subject: Application for refund of Deposit-V (Dep-V) deducted from running/final bills
+  </div>
+
+  <!-- ── Salutation ── -->
+  <p><strong>Sir/Madam,</strong></p>
+
+  <!-- ── Body ── -->
+  <p>
+    With due respect, we, <em>[Contractor Name]</em>, have successfully completed the works
+    assigned by your department under Contract No. [Contract No.]. During the execution,
+    Deposit-V amounts were deducted from our running and final bills as per department rules.
+  </p>
+
+  <p>Below are the details of the vouchers for which we respectfully request refund:</p>
+
+  <!-- ── Works Table ── -->
+  <table class="works-table">
+    <thead>
+      <tr>
+        <th>Sr.No.</th>
+        <th>Voucher No.</th>
+        <th>Voucher Date</th>
+        <th>Deposit Amount (₹)</th>
+        <th>Remaining Amount (₹)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>[Voucher Number]</td>
+        <td>[DD-MM-YYYY]</td>
+        <td>₹ 0.00</td>
+        <td>₹ 0.00</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3"><strong>Total</strong></td>
+        <td><strong>₹ 0.00</strong></td>
+        <td><strong>₹ 0.00</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── Grounds ── -->
+  <p><strong>Grounds for refund:</strong></p>
+  <ol>
+    <li>All works have been successfully completed and handed over to the department.</li>
+    <li>The guarantee/defect liability period has expired without any pending claims.</li>
+    <li>No dues are outstanding against us in respect of the above works.</li>
+  </ol>
+
+  <!-- ── Prayer ── -->
+  <p>
+    In view of the above, we respectfully request the release of the Deposit-V amount of
+    <strong>₹ [Amount]</strong> (Rupees [Amount in Words] only) at the earliest.
+    Your prompt and favourable action in this matter shall be highly appreciated.
+  </p>
+
+  <div class="closing-block">
+    <p>Thanking you,</p>
+  </div>
+
+  <!-- ── Signature ── -->
+  <div class="signature-block">
+    <p><strong>Yours faithfully,</strong></p>
+    <div class="spacer"></div>
+    <p class="sig-label">[Contractor Name / Firm]</p>
+    <p>(Authorized Signatory)</p>
+    <p style="color:#777; font-size:12pt;">[Company Seal]</p>
+  </div>
+
+  <hr class="thin"/>
+
+  <!-- ── CC Section ── -->
+  <div class="cc-section">
+    <strong>Copy to:-</strong><br/>
+    1) The Superintending Engineer, P.W.D. [Circle], Udaipur.<br/>
+    2) Office file.
+  </div>
+
 </div>
 </body>
 </html>

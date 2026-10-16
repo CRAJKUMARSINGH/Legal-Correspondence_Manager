@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Search, Download, Upload, Keyboard, Calculator, Database, Zap, BarChart3, Settings, HelpCircle } from 'lucide-react'
 import { useSearch } from '../hooks/useSearch'
-import { useKeyboardShortcuts, createAppShortcuts, useShortcutHelp } from '../hooks/useKeyboardShortcuts'
+import { useKeyboardShortcuts, createAppShortcuts } from '../hooks/useKeyboardShortcuts'
 import { useInterestCalculator } from '../lib/interestCalculator'
 import { DataManager } from '../lib/dataManager'
 import { templateCache } from '../lib/templateCache'
@@ -497,7 +497,7 @@ export const EfficiencyDashboard: React.FC = () => {
                 {Object.entries(
                   shortcuts.reduce((acc, shortcut) => {
                     if (!acc[shortcut.category]) acc[shortcut.category] = []
-                    acc[shortcut.category].push(shortcut)
+                    acc[shortcut.category]!.push(shortcut)
                     return acc
                   }, {} as Record<string, typeof shortcuts>)
                 ).map(([category, categoryShortcuts]) => (
@@ -526,6 +526,16 @@ export const EfficiencyDashboard: React.FC = () => {
           </div>
         )}
       </div>
+      {/* Keyboard shortcut help overlay */}
+      {showHelp && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setShowHelp(false)}>
+          <div className="bg-white rounded-xl p-6 shadow-2xl max-w-sm w-full mx-4" onClick={e => e.stopPropagation()}>
+            <h3 className="font-semibold text-gray-800 mb-3">Keyboard Shortcuts Help</h3>
+            <p className="text-sm text-gray-600 mb-4">Switch to the Shortcuts tab to see all available shortcuts.</p>
+            <button onClick={() => setShowHelp(false)} className="btn-secondary w-full">Close</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

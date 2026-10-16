@@ -200,7 +200,7 @@ class AnalyticsManager {
     this.saveAnalyticsData()
   }
 
-  recordError(type: string, message: string) {
+  recordError(_type: string, _message: string) {
     this.data.errorCount++
     this.saveAnalyticsData()
   }
